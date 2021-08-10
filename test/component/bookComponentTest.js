@@ -23,6 +23,7 @@ describe('Book inventory', function () {
 
         assert.deepStrictEqual(readResult.body, {
             title: "JavaScript in Action",
+            slug: "javascript-in-action",
             authors: ["James Smith", "Kate Donovan"],
             isbn: "2123456789",
             description: "The ultimate JS book!"
