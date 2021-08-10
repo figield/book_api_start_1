@@ -1,38 +1,22 @@
-const MongoClient = require('mongodb').MongoClient;
+const bookRepository = require("./bookRepository");
 
-const url = 'mongodb://localhost:27017/booksapi';
-
-const booksPromise = MongoClient.connect(url).then(client => client.db().collection("books"));
-
-const bookController = {
-    async  createOrUpdate(req, res, next) {
+module.exports = {
+    async createOrUpdate(req, res, next) {
         const {title, authors, isbn, description} = req.body;
         try {
-            const books = await booksPromise;
-            await books.updateOne(
-                {isbn: isbn},
-                {$set: {title, authors, isbn, description}},
-                {upsert: true}
-            )
+            await bookRepository.createOrUpdate({title, authors, isbn, description});
             res.json({title, authors, isbn, description});
         } catch (e) {
             next(e);
         }
     },
     async details(req, res, next) {
-        const isbn = req.params.isbn;
         try {
-            const books = await booksPromise;
-            const book = await books.findOne(
-                {isbn},
-                {projection: {_id: 0}}
-            );
+            const isbn = req.params.isbn;
+            const book = await bookRepository.findOne(isbn);
             res.json(book);
-        } catch (e) {
+        } catch(e) {
             next(e);
         }
-
     }
 };
-
-module.exports = bookController;
