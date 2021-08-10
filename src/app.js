@@ -1,8 +1,6 @@
 const express = require("express");
-const MongoClient = require('mongodb').MongoClient;
+const bookRoutes = require("./bookRoutes");
 const app = express();
-
-const url = 'mongodb://localhost:27017/booksapi';
 
 function log(req, res, next) {
     // log incoming request
@@ -24,40 +22,7 @@ app.get("/", auth, function (req, res) {
     res.send("Hello World!");
 });
 
-// function(err, client) {
-//     books = client.db().collection("books");
-// }
-const booksPromise = MongoClient.connect(url).then(client => client.db().collection("books"));
-
-app.post("/book", async function (req, res, next) {
-    const {title, authors, isbn, description} = req.body;
-    try {
-        const books = await booksPromise;
-        await books.updateOne(
-            {isbn: isbn},
-            {$set: {title, authors, isbn, description}},
-            {upsert: true}
-        )
-        res.json({title, authors, isbn, description});
-    } catch (e) {
-        next(e);
-    }
-});
-
-app.get("/book/:isbn", async function (req, res, next) {
-    const isbn = req.params.isbn;
-    try {
-        const books = await booksPromise;
-        const book = await books.findOne(
-            {isbn},
-            {projection: {_id: 0}}
-        );
-        res.json(book);
-    } catch (e) {
-        next(e);
-    }
-
-});
+app.use("/", bookRoutes)
 
 app.use(function notFound(req, res, next) {
     const err = new Error("Not Found");
