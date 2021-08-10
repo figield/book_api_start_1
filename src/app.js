@@ -29,33 +29,34 @@ app.get("/", auth, function (req, res) {
 // }
 const booksPromise = MongoClient.connect(url).then(client => client.db().collection("books"));
 
-app.post("/book", function (req, res, next) {
+app.post("/book", async function (req, res, next) {
     const {title, authors, isbn, description} = req.body;
-    booksPromise
-        .then(books => books.updateOne(
+    try {
+        const books = await booksPromise;
+        await books.updateOne(
             {isbn: isbn},
             {$set: {title, authors, isbn, description}},
             {upsert: true}
-        ))
-        .then(() => {
-            res.json({title, authors, isbn, description})
-        })
-        .catch(next);
+        )
+        res.json({title, authors, isbn, description});
+    } catch (e) {
+        next(e);
+    }
 });
 
-app.get("/book/:isbn", function (req, res, next) {
+app.get("/book/:isbn", async function (req, res, next) {
     const isbn = req.params.isbn;
-    booksPromise
-        .then(function (books) {
-            return books.findOne(
-                {isbn},
-                {projection: {_id: 0}}
-            );
-        })
-        .then(function (book) {
-            res.json(book);
-        })
-        .catch(next);
+    try {
+        const books = await booksPromise;
+        const book = await books.findOne(
+            {isbn},
+            {projection: {_id: 0}}
+        );
+        res.json(book);
+    } catch (e) {
+        next(e);
+    }
+
 });
 
 app.use(function notFound(req, res, next) {
