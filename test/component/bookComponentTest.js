@@ -2,8 +2,8 @@ const httpClient = require('supertest');
 const app = require('../../src/app');
 
 describe('Book inventory', function () {
-    it('allows to stock up the items', function (done) {
-        httpClient(app)
+    it('allows to stock up the items', function () {
+        return httpClient(app)
             .post('/book')
             .send({
                 title: "JavaScript in Action",
@@ -17,6 +17,6 @@ describe('Book inventory', function () {
                 authors: ["James Smith", "Kate Donovan"],
                 isbn: "0123456789",
                 description: "The ultimate JS book!"
-            }, done);
+            });
     })
 });

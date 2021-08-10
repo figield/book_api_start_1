@@ -8,10 +8,14 @@ function log(req, res, next) {
     // log incoming request
     next();
 }
+
 function auth(req, res, next) {
     // do auth
     next();
 }
+
+// application scope vs request scope
+
 
 app.use(express.json());
 app.use(log);
@@ -19,29 +23,37 @@ app.use(log);
 app.get("/", auth, function (req, res) {
     res.send("Hello World!");
 });
+
+// function(err, client) {
+//     books = client.db().collection("books");
+// }
+const booksPromise = MongoClient.connect(url).then(client => client.db().collection("books"));
+
+app.post("/book", function (req, res) {
+    const {title, authors, isbn, description} = req.body;
+    booksPromise
+        .then(books => books.updateOne(
+            {isbn: isbn},
+            {$set: {title, authors, isbn, description}},
+            {upsert: true}
+        ))
+        .then(() => {
+            res.json({title, authors, isbn, description})
+        });
+});
+
 app.get("/book/:isbn", function (req, res) {
     const isbn = req.params.isbn;
-    MongoClient.connect(url, function(err, client) {
-        client.db().collection("books").findOne({isbn}, { projection: {_id: 0} }, function(err, book) {
+    booksPromise
+        .then(function (books) {
+            return books.findOne(
+                {isbn},
+                {projection: {_id: 0}}
+            );
+        })
+        .then(function (book) {
             res.json(book);
         });
-
-        client.close();
-    });
-});
-app.post("/book", function(req, res) {
-    const {title, authors, isbn, description} = req.body;
-    MongoClient.connect(url, function(err, client) {
-        client.db().collection("books").updateOne(
-            {isbn: isbn},
-            { $set: {title, authors, isbn, description} },
-            {upsert: true}
-        );
-
-        client.close();
-    });
-
-    res.json({title, authors, isbn, description});
 });
 
 app.use(function notFound(req, res, next) {
