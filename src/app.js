@@ -29,7 +29,7 @@ app.get("/", auth, function (req, res) {
 // }
 const booksPromise = MongoClient.connect(url).then(client => client.db().collection("books"));
 
-app.post("/book", function (req, res) {
+app.post("/book", function (req, res, next) {
     const {title, authors, isbn, description} = req.body;
     booksPromise
         .then(books => books.updateOne(
@@ -39,10 +39,11 @@ app.post("/book", function (req, res) {
         ))
         .then(() => {
             res.json({title, authors, isbn, description})
-        });
+        })
+        .catch(next);
 });
 
-app.get("/book/:isbn", function (req, res) {
+app.get("/book/:isbn", function (req, res, next) {
     const isbn = req.params.isbn;
     booksPromise
         .then(function (books) {
@@ -53,7 +54,8 @@ app.get("/book/:isbn", function (req, res) {
         })
         .then(function (book) {
             res.json(book);
-        });
+        })
+        .catch(next);
 });
 
 app.use(function notFound(req, res, next) {
