@@ -5,7 +5,8 @@ module.exports = {
         const {title, authors, isbn, description} = req.body;
         try {
             await bookRepository.createOrUpdate({title, authors, isbn, description});
-            res.json({title, authors, isbn, description});
+            // res.json({title, authors, isbn, description});
+            res.redirect(`/book/${isbn}`);
         } catch (e) {
             next(e);
         }
