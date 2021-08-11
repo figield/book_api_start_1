@@ -18,5 +18,11 @@ module.exports = {
             {isbn},
             { projection: {_id: 0} }
         );
+    },
+    async findAll() {
+        const books = await booksPromise;
+        return books
+            .find()
+            .toArray();
     }
 };
