@@ -9,11 +9,12 @@ function withErrorHandling(api) {
 
 const wrapWithTryCatch = (fn) => {
     return async function (req, res, next) {
-        try {
-            return fn(req, res, next);
-        } catch(e) {
-            next(e);
-        }
+        return Promise.resolve(fn(req, res, next)).catch(next);
+        // try {
+        //     return fn(req, res, next);
+        // } catch(e) {
+        //     next(e);
+        // }
     };
 };
 
