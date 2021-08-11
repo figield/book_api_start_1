@@ -1,7 +1,7 @@
-const bookRepository = require("./bookRepository");
-const bookService = require("./bookService");
+// const bookRepository = require("./bookRepository");
+// const bookService = require("./bookService");
 
-module.exports = {
+module.exports = ({bookService, bookRepository}) => ({
     async createOrUpdate(req, res, next) {
         // HTTP
         const {title, authors, isbn, description} = req.body;
@@ -23,4 +23,4 @@ module.exports = {
             next(e);
         }
     }
-};
+});
