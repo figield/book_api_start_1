@@ -1,5 +1,7 @@
 const router = require('express').Router();
-const {createOrUpdate, details } = require("./bookController");
+const bookRepository = require("./bookRepository");
+const bookService = require("./bookService");
+const {createOrUpdate, details } = require("./bookController")({bookService, bookRepository});
 const validateBook = require("./validateBookMiddleware");
 
 router.post("/book", validateBook, createOrUpdate);

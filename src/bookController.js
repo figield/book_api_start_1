@@ -1,6 +1,3 @@
-// const bookRepository = require("./bookRepository");
-// const bookService = require("./bookService");
-
 module.exports = ({bookService, bookRepository}) => ({
     async createOrUpdate(req, res, next) {
         // HTTP
